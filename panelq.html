@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+var subs = [];
+var pubs = {};
+
+class RelayPublisher {
+  constructor(output_name) {
+    this._output_name = output_name;
+    this._output_value = false;
+  }
+  set output(new_value) {
+    if(this._output_value != new_value) {
+      this._output_value = new_value;
+      this.notify();
+    }
+  }
+  get output() {
+    return this._output_value;
+  }
+  toggle() {
+    if(this._output_value) {
+      this._output_value = false;
+    }
+    else {
+      this._output_value = true;
+    }
+    this.notify();
+  }
+  notify() {
+    var s;
+    for (s of subs) {
+      s.notify(this._output_name);
+    }
+  }
+}
+
+class RelaySubscriber {
+  constructor(input_list) {
+    this._input_list = input_list;
+  }
+  notify(relay_name) {
+    if(this._input_list.indexOf(relay_name)>=0) {
+      this.update();
+    }
+  }
+  update() {
+    console.info(this.toString());
+  }
+}
+
+class OrGate extends RelaySubscriber {
+  constructor(in1_name,in2_name,out_name) {
+    super([in1_name,in2_name]);
+    this._in1_name = in1_name;
+    this._in2_name = in2_name;
+    this._out_name = out_name;
+    pubs[out_name]=new RelayPublisher(out_name);
+  }
+  update() {
+    pubs[this._out_name].output = pubs[this._in1_name].output || pubs[this._in2_name].output;
+  }
+}   
+
+class NotGate extends RelaySubscriber {
+  constructor(in_name,out_name) {
+    super([in_name]);
+    this._in_name = in_name;
+    this._out_name = out_name;
+    pubs[out_name]=new RelayPublisher(out_name);
+  }
+  update() {
+    pubs[this._out_name].output = !pubs[this._in_name].output;
+  }
+}   
+
+class AndGate extends RelaySubscriber {
+  constructor(in1_name,in2_name,out_name) {
+    super([in1_name,in2_name]);
+    this._in1_name = in1_name;
+    this._in2_name = in2_name;
+    this._out_name = out_name;
+    pubs[out_name]=new RelayPublisher(out_name);
+  }
+  update() {
+    pubs[this._out_name].output = pubs[this._in1_name].output && pubs[this._in2_name].output;
+  }
+}   
+
+class ImageSwitcher extends RelaySubscriber {
+  constructor(input_name,elem,img_false,img_true) {
+    super([input_name]);
+    this._input_name = input_name;
+    this._elem = elem;
+    this._img_false = img_false;
+    this._img_true = img_true;
+    this.update();
+  }
+  update() {
+    if (pubs[this._input_name].output) {
+      $(this._elem).attr("src",this._img_true);
+    }
+    else {
+      $(this._elem).attr("src",this._img_false);
+    }
+  }
+}
+
+var switches = {};
+
+class ToggleSwitch {
+  constructor(output_name) {
+    this._out_name = output_name;
+    pubs[output_name]=new RelayPublisher(output_name);
+  }
+  cycle() {
+    if(pubs[this._out_name].output) {
+      pubs[this._out_name].output = false;
+    }
+    else {
+      pubs[this._out_name].output = true;
+    }
+  }
+}
+
+function switch_2way(elem,relay,img_on,img_off) {
+  switches[elem]=new ToggleSwitch(relay);
+  subs.push(new ImageSwitcher(relay,"#"+elem,img_on,img_off));
+}
+
+function setup_panel() {
+  switch_2way("0201","SW1","knob_2way_left.png","knob_2way_right.png");
+  subs.push(new ImageSwitcher("SW1","#0401","indic_sgl_off.png","indic_g_on.png"));
+  switch_2way("0202","SW2a","knob_2way_left.png","knob_2way_right.png");
+  switch_2way("0302","SW2b","knob_2way_left.png","knob_2way_right.png");
+  subs.push(new OrGate("SW2a","SW2b","SW2"));
+  subs.push(new ImageSwitcher("SW2","#0402","indic_sgl_off.png","indic_g_on.png"));
+  switch_2way("0205","SW3a","knob_2way_left.png","knob_2way_right.png");
+  switch_2way("0305","SW3b","knob_2way_left.png","knob_2way_right.png");
+  subs.push(new AndGate("SW3a","SW3b","SW3c"));
+  subs.push(new ImageSwitcher("SW3c","#0105","indic_rg_red_on.png","indic_rg_green_on.png"));
+  switch_2way("0207","SW4a","knob_2way_left.png","knob_2way_right.png");
+  switch_2way("0307","SW4b","knob_2way_left.png","knob_2way_right.png");
+  subs.push(new AndGate("SW4a","SW4b","SW4c"));
+  subs.push(new NotGate("SW4a","nSW4a"));
+  subs.push(new AndGate("SW4y","SW4b","SW4d"));
+  subs.push(new OrGate("SW4c","SW4d","SW4y"));
+  subs.push(new ImageSwitcher("SW4y","#0107","indic_rg_red_on.png","indic_rg_green_on.png"));
+}
+
+function display_relays() {
+  var p;
+  var str = "";
+  for (p in pubs) {
+    str += p + " : " + pubs[p].output + "<br/>";
+  }
+  $("#relays").html(str);
+}
+
+$(document).ready(function(){
+  $("img").click(function(){
+    if (switches[this.id]) {
+      console.info(this.id + " toggle");
+      switches[this.id].cycle();
+    }
+    display_relays();
+  });
+  setup_panel();
+  for (p in pubs) {
+    pubs[p].notify();
+  }
+  display_relays();
+});
+</script>
+</head>
+
+<body style="text-align:center; background-color:green">
+
+<h1 style="text-align:center">Clarbeston Road</h1>
+
+<table cellpadding="0" border="0" margin="0" style="text-align:center; border-spacing:0px">
+<tr>
+<td><img src="tile.png" alt="tile" id="0101" /></td>
+<td><img src="tile.png" alt="tile" id="0102" /></td>
+<td><img src="tile.png" alt="tile" id="0103" /></td>
+<td><img src="tile.png" alt="tile" id="0104" /></td>
+<td><img src="tile.png" alt="tile" id="0105" /></td>
+<td><img src="tile.png" alt="tile" id="0106" /></td>
+<td><img src="tile.png" alt="tile" id="0107" /></td>
+<td><img src="tile.png" alt="tile" id="0108" /></td>
+<td><img src="tile.png" alt="tile" id="0109" /></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>1</td>
+<td></td>
+<td>2</td>
+<td></td>
+<td>3</td>
+<td></td>
+<td>4</td>
+<td></td>
+</tr>
+<tr>
+<td><img src="tile.png" alt="tile" id="0201" /></td>
+<td><img src="tile.png" alt="tile" id="0202" /></td>
+<td><img src="tile.png" alt="tile" id="0203" /></td>
+<td><img src="tile.png" alt="tile" id="0204" /></td>
+<td><img src="tile.png" alt="tile" id="0205" /></td>
+<td><img src="tile.png" alt="tile" id="0206" /></td>
+<td><img src="tile.png" alt="tile" id="0207" /></td>
+<td><img src="tile.png" alt="tile" id="0208" /></td>
+<td><img src="tile.png" alt="tile" id="0209" /></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>Down</td>
+<td></td>
+<td>Down</td>
+<td></td>
+<td>Down</td>
+<td></td>
+<td>Down</td>
+<td></td>
+</tr>
+<tr>
+<td><img src="tile.png" alt="tile" id="0301" /></td>
+<td><img src="tile.png" alt="tile" id="0302" /></td>
+<td><img src="tile.png" alt="tile" id="0303" /></td>
+<td><img src="tile.png" alt="tile" id="0304" /></td>
+<td><img src="tile.png" alt="tile" id="0305" /></td>
+<td><img src="tile.png" alt="tile" id="0306" /></td>
+<td><img src="tile.png" alt="tile" id="0307" /></td>
+<td><img src="tile.png" alt="tile" id="0308" /></td>
+<td><img src="tile.png" alt="tile" id="0309" /></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Up</td>
+<td></td>
+<td>Up</td>
+<td></td>
+</tr>
+<tr>
+<td><img src="tile.png" alt="tile" id="0401" /></td>
+<td><img src="tile.png" alt="tile" id="0402" /></td>
+<td><img src="tile.png" alt="tile" id="0403" /></td>
+<td><img src="tile.png" alt="tile" id="0404" /></td>
+<td><img src="tile.png" alt="tile" id="0405" /></td>
+<td><img src="tile.png" alt="tile" id="0406" /></td>
+<td><img src="tile.png" alt="tile" id="0407" /></td>
+<td><img src="tile.png" alt="tile" id="0408" /></td>
+<td><img src="tile.png" alt="tile" id="0409" /></td>
+</tr>
+</table>
+
+<p id="debug">Debug content here</p>
+
+<p id="relays">Relays will appear here</p>
+
+</body>
+</html>

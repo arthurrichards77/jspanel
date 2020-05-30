@@ -1,0 +1,113 @@
+<html>
+<head>
+<script>
+
+var ui={};
+
+function display_ui() {
+  str = ""
+  for (x in ui) {
+    str += x + " : " + ui[x] + "<br />"
+  }
+  document.getElementById("ui").innerHTML = str;
+}
+
+function cycle_knob(id) {
+  document.getElementById("debug").innerHTML = "Hello from " + id;
+  if (ui[id]) {
+    ui[id] = 0;
+    document.getElementById(id).src = "knob_2way_left.png";
+  }
+  else {
+    ui[id] = 1;
+    document.getElementById(id).src = "knob_2way_right.png";
+  }
+  display_ui();
+}
+
+</script>
+</head>
+<body style="text-align:center; background-color:white">
+<h1 style="text-align:center">Clarbeston Road</h1>
+
+<table cellpadding="0" border="0" margin="0" style="text-align:center; border-spacing:0px">
+<tr>
+<td><img src="tile.png" alt="tile" /></td>
+<td><img src="tile.png" alt="tile" /></td>
+<td><img src="indic_rg_red_on.png" alt="tile" /></td>
+<td><img src="tile.png" alt="tile" /></td>
+<td><img src="indic_rg_red_on.png" alt="tile" /></td>
+<td><img src="tile.png" alt="tile" /></td>
+<td><img src="indic_rg_red_on.png" alt="tile" /></td>
+<td><img src="tile.png" alt="tile" /></td>
+<td><img src="indic_rg_red_on.png" alt="tile" /></td>
+<td><img src="tile.png" alt="tile" /></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>1</td>
+<td></td>
+<td>2</td>
+<td></td>
+<td>3</td>
+<td></td>
+<td>4</td>
+<td></td>
+</tr>
+<tr>
+<td><img src="tile.png" alt="tile" /></td>
+<td><img src="tile.png" alt="tile" /></td>
+<td><img id="sw1" src="knob_2way_left.png" alt="tile" onclick="cycle_knob(this.id)" /></td>
+<td><img src="tile.png" alt="tile" /></td>
+<td><img id="sw2" src="knob_2way_left.png" alt="tile" onclick="cycle_knob(this.id)" /></td>
+<td><img src="tile.png" alt="tile" /></td>
+<td><img id="sw3" src="knob_2way_left.png" alt="tile" onclick="cycle_knob(this.id)" /></td>
+<td><img src="tile.png" alt="tile" /></td>
+<td><img id="sw4" src="knob_2way_left.png" alt="tile" onclick="cycle_knob(this.id)" /></td>
+<td><img src="tile.png" alt="tile" /></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>Down</td>
+<td></td>
+<td>Down</td>
+<td></td>
+<td>Down</td>
+<td></td>
+<td>Down</td>
+<td></td>
+</tr>
+<tr>
+<td><img src="tile.png" alt="tile" /></td>
+<td><img src="tile.png" alt="tile" /></td>
+<td><img src="tile.png" alt="tile" /></td>
+<td><img src="tile.png" alt="tile" /></td>
+<td><img src="tile.png" alt="tile" /></td>
+<td><img src="tile.png" alt="tile" /></td>
+<td><img id="sw3a" src="knob_2way_left.png" alt="tile" onclick="cycle_knob(this.id)" /></td>
+<td><img src="tile.png" alt="tile" /></td>
+<td><img id="sw4a" src="knob_2way_left.png" alt="tile" onclick="cycle_knob(this.id)" /></td>
+<td><img src="tile.png" alt="tile" /></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>Up</td>
+<td></td>
+<td>Up</td>
+<td></td>
+</tr>
+</table>
+
+<p id="debug">Debug content here</p>
+
+<p id="ui">Debug content here</p>
+
+</body>
+</html>
