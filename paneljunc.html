@@ -131,33 +131,23 @@ function switch_2way(elem,relay,img_on,img_off) {
 }
 
 function setup_panel() {
-  switch_2way("0201","SW1","knob_2way_left.png","knob_2way_right.png");
-  subs.push(new ImageSwitcher("SW1","#0401","indic_sgl_off.png","indic_g_on.png"));
 
-  switch_2way("0202","SW2a","knob_2way_left.png","knob_2way_right.png");
-  switch_2way("0302","SW2b","knob_2way_left.png","knob_2way_right.png");
-  subs.push(new OrGate("SW2a","SW2b","SW2"));
-  subs.push(new ImageSwitcher("SW2","#0402","indic_sgl_off.png","indic_g_on.png"));
+  switch_2way("0202","SW1","knob_2way_left.png","knob_2way_right.png");
+  switch_2way("0302","SW3","knob_2way_left.png","knob_2way_right.png");
+  subs.push(new OrGate("SW1","SW3","SW1x"));
+  subs.push(new ImageSwitcher("SW1x","#0402","indic_sgl_off.png","indic_g_on.png"));
+  subs.push(new ImageSwitcher("SW1","#0102","indic_rg_red_on.png","indic_rg_green_on.png"));
 
-  switch_2way("0205","SW3a","knob_2way_left.png","knob_2way_right.png");
-  switch_2way("0305","SW3b","knob_2way_left.png","knob_2way_right.png");
-  subs.push(new AndGate("SW3a","SW3b","SW3c"));
-  subs.push(new ImageSwitcher("SW3c","#0105","indic_rg_red_on.png","indic_rg_green_on.png"));
+  switch_2way("0204","SW2","knob_2way_left.png","knob_2way_right.png");
+  subs.push(new ImageSwitcher("SW2","#0104","indic_rg_red_on.png","indic_rg_green_on.png"));
+  subs.push(new ImageSwitcher("SW2","#0404","indic_sgl_off.png","indic_g_on.png"));
 
-  switch_2way("0207","SW4","knob_2way_left.png","knob_2way_right.png");
+  switch_2way("0206","SW4","knob_2way_left.png","knob_2way_right.png");
+  subs.push(new ImageSwitcher("SW4","#0106","indic_rg_red_on.png","indic_rg_green_on.png"));
+  subs.push(new ImageSwitcher("SW4","#0406","indic_sgl_off.png","indic_g_on.png"));
 
   switch_2way("0208","SW5","knob_2way_left.png","knob_2way_right.png");
-
-  subs.push(new OrGate("SW5s","SW5h","SW5y"));
-  subs.push(new AndGate("SW5","nSW4","SW5s"));
-  subs.push(new OrGate("SW4y","SW5","SW5h_1"));
-  subs.push(new AndGate("SW5h_1","SW5y","SW5h"));
-  
-  subs.push(new AndGate("SW4","SW5y","SW4y"));
-  subs.push(new NotGate("SW4","nSW4"));
-
-  subs.push(new ImageSwitcher("SW5y","#0108","indic_rg_red_on.png","indic_rg_green_on.png"));
-  subs.push(new ImageSwitcher("SW4y","#0107","indic_rg_red_on.png","indic_rg_green_on.png"));
+  subs.push(new ImageSwitcher("SW5","#0108","indic_rg_red_on.png","indic_rg_green_on.png"));
   
 }
 
@@ -232,14 +222,14 @@ $(document).ready(function(){
 </tr>
 <tr>
 <td></td>
-<td></td>
 <td>1</td>
 <td></td>
 <td>2</td>
 <td></td>
-<td>3</td>
-<td></td>
 <td>4</td>
+<td></td>
+<td>5</td>
+<td></td>
 <td></td>
 </tr>
 <tr>
@@ -255,14 +245,14 @@ $(document).ready(function(){
 </tr>
 <tr>
 <td></td>
+<td>Down Main</td>
 <td></td>
-<td>Down</td>
+<td>Up Main</td>
 <td></td>
-<td>Down</td>
+<td>Up Main</td>
 <td></td>
-<td>Down</td>
 <td></td>
-<td>Down</td>
+<td></td>
 <td></td>
 </tr>
 <tr>
@@ -278,14 +268,14 @@ $(document).ready(function(){
 </tr>
 <tr>
 <td></td>
+<td>Down Branch</td>
 <td></td>
 <td></td>
 <td></td>
 <td></td>
 <td></td>
-<td>Up</td>
 <td></td>
-<td>Up</td>
+<td></td>
 <td></td>
 </tr>
 <tr>
