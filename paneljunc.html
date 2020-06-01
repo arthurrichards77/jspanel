@@ -96,7 +96,7 @@ class ImageSwitcher extends RelaySubscriber {
     this._elem = elem;
     this._img_false = img_false;
     this._img_true = img_true;
-    this.update();
+    //this.update();
   }
   update() {
     if (pubs[this._input_name].output) {
@@ -135,20 +135,55 @@ function setup_panel() {
   switch_2way("0202","SW1","knob_2way_left.png","knob_2way_right.png");
   switch_2way("0302","SW3","knob_2way_left.png","knob_2way_right.png");
   subs.push(new OrGate("SW1","SW3","SW1x"));
+  subs.push(new OrGate("RT1","RT3","RT1x"));
   subs.push(new ImageSwitcher("SW1x","#0402","indic_sgl_off.png","indic_g_on.png"));
-  subs.push(new ImageSwitcher("SW1","#0102","indic_rg_red_on.png","indic_rg_green_on.png"));
+  subs.push(new ImageSwitcher("RT1x","#0102","indic_rg_red_on.png","indic_rg_green_on.png"));
 
   switch_2way("0204","SW2","knob_2way_left.png","knob_2way_right.png");
-  subs.push(new ImageSwitcher("SW2","#0104","indic_rg_red_on.png","indic_rg_green_on.png"));
+  subs.push(new ImageSwitcher("RT2","#0104","indic_rg_red_on.png","indic_rg_green_on.png"));
   subs.push(new ImageSwitcher("SW2","#0404","indic_sgl_off.png","indic_g_on.png"));
 
   switch_2way("0206","SW4","knob_2way_left.png","knob_2way_right.png");
-  subs.push(new ImageSwitcher("SW4","#0106","indic_rg_red_on.png","indic_rg_green_on.png"));
+  subs.push(new ImageSwitcher("RT4","#0106","indic_rg_red_on.png","indic_rg_green_on.png"));
   subs.push(new ImageSwitcher("SW4","#0406","indic_sgl_off.png","indic_g_on.png"));
 
   switch_2way("0208","SW5","knob_2way_left.png","knob_2way_right.png");
-  subs.push(new ImageSwitcher("SW5","#0108","indic_rg_red_on.png","indic_rg_green_on.png"));
   
+  subs.push(new NotGate("PL5","nPL5"));
+  subs.push(new NotGate("PT5","nPT5"));
+  subs.push(new AndGate("SW5","nPL5","PT5a"));
+  subs.push(new AndGate("PL5","PT5","PT5b"));
+  subs.push(new AndGate("SW5","PT5","PT5c"));
+  subs.push(new OrGate("PT5a","PT5b","PT5d"));
+  subs.push(new OrGate("PT5c","PT5d","PT5"));
+
+  subs.push(new ImageSwitcher("PT5","#0108","indic_lr_l_on.png","indic_lr_r_on.png"));
+
+  subs.push(new AndGate("nPT5","nRT2","RT1a"));
+  subs.push(new OrGate("RT1a","RT1","RT1b"));
+  subs.push(new AndGate("RT1b","SW1","RT1"));
+  subs.push(new NotGate("RT1","nRT1"));
+
+  subs.push(new AndGate("nPT5","nRT1","RT2a"));
+  subs.push(new OrGate("RT2a","RT2","RT2b"));
+  subs.push(new AndGate("RT2b","SW2","RT2"));
+  subs.push(new NotGate("RT2","nRT2"));
+
+  subs.push(new AndGate("PT5","nRT4","RT3a"));
+  subs.push(new OrGate("RT3a","RT3","RT3b"));
+  subs.push(new AndGate("RT3b","SW3","RT3"));
+  subs.push(new NotGate("RT3","nRT3"));
+
+  subs.push(new AndGate("PT5","nRT3","RT4a"));
+  subs.push(new OrGate("RT4a","RT4","RT4b"));
+  subs.push(new AndGate("RT4b","SW4","RT4"));
+  subs.push(new NotGate("RT4","nRT4"));
+
+  subs.push(new OrGate("RT1","RT3","PL5a"));
+  subs.push(new OrGate("RT2","RT4","PL5b"));
+  subs.push(new OrGate("PL5a","PL5b","PL5"));
+  subs.push(new ImageSwitcher("PL5","#0308","indic_sgl_off.png","indic_r_on.png"));
+
 }
 
 function display_relays() {
@@ -182,28 +217,43 @@ $(document).ready(function(){
 <h1 style="text-align:center">Clarbeston Road</h1>
 
 <table cellpadding="0" border="0" margin="0" cellspacing="0" style="text-align:center; border-spacing:0px">
-<tr>
-<td><img src="tile.png" alt="tile" style="display: block;" /></td>
-<td><img src="line.png" alt="tile" style="display: block;" /></td>
-<td><img src="line.png" alt="tile" style="display: block;" /></td>
-<td><img src="switch_se.png" alt="tile" style="display: block;" /></td>
-<td><img src="line.png" alt="tile" style="display: block;" /></td>
-<td><img src="line.png" alt="tile" style="display: block;" /></td>
-<td><img src="line.png" alt="tile" style="display: block;" /></td>
-<td><img src="tile.png" alt="tile" style="display: block;" /></td>
-<td><img src="tile.png" alt="tile" style="display: block;" /></td>
+
+<tr style="height: 100px">
+<td style="background-image: url(tile.png); width:100px"></td>
+<td style="background-image: url(tile.png); width:100px"></td>
+<td style="background-image: url(tile.png); width:100px"></td>
+<td style="background-image: url(tile.png); width:100px"></td>
+<td style="background-image: url(tile.png); width:100px"></td>
+<td style="background-image: url(tile.png); width:100px"></td>
+<td style="background-image: url(tile.png); width:100px"></td>
+<td style="background-image: url(tile.png); width:100px"></td>
+<td style="background-image: url(tile.png); width:100px"></td>
 </tr>
-<tr>
-<td><img src="tile.png" alt="tile" style="display: block;" /></td>
-<td><img src="tile.png" alt="tile" style="display: block;" /></td>
-<td><img src="tile.png" alt="tile" style="display: block;" /></td>
-<td><img src="line_ne.png" alt="tile" style="display: block;" /></td>
-<td><img src="line.png" alt="tile" style="display: block;" /></td>
-<td><img src="line.png" alt="tile" style="display: block;" /></td>
-<td><img src="line.png" alt="tile" style="display: block;" /></td>
-<td><img src="tile.png" alt="tile" style="display: block;" /></td>
-<td><img src="tile.png" alt="tile" style="display: block;" /></td>
+
+<tr style="height: 100px; vertical-align:top">
+<td style="background-image: url(tile.png); width:"></td>
+<td style="background-image: url(line.png)"></td>
+<td style="background-image: url(line.png)">1</td>
+<td style="background-image: url(line.png)"></td>
+<td style="background-image: url(switch_se.png)"><br />5</td>
+<td style="background-image: url(line.png)">2</td>
+<td style="background-image: url(line.png)"></td>
+<td style="background-image: url(line.png)"></td>
+<td style="background-image: url(tile.png)"></td>
 </tr>
+
+<tr style="height: 100px; vertical-align:top">
+<td style="background-image: url(tile.png)"></td>
+<td style="background-image: url(tile.png)"></td>
+<td style="background-image: url(tile.png)"></td>
+<td style="background-image: url(tile.png)"></td>
+<td style="background-image: url(line_ne.png)"></td>
+<td style="background-image: url(line.png)">4</td>
+<td style="background-image: url(line.png)"></td>
+<td style="background-image: url(line.png)"></td>
+<td style="background-image: url(tile.png)"></td>
+</tr>
+
 </table>
 
 <p />
